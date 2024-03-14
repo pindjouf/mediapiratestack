@@ -2,7 +2,7 @@
 
 This project aims to get people accustomed to working with home servers, VPNs & P2P file sharing by showing them how to get access to their home network remotely and torrenting various media, assuming they already own a paid for copy of said media.
 
-The setup is fairly simple, here's a list of what we need: (All the devices listed below are merely my suggestions, you can definitely work with alternatives).
+The setup is fairly simple, here's a list of what we need: (All the devices/services listed below are merely my suggestions, you can definitely work with alternatives).
 
 **Hardware:**
 - Server = [Raspberry Pi](https://www.amazon.com.be/s?k=raspberry+pi), [ZimaBlade](https://shop.zimaboard.com/products/zimablade-single-board-server-for-cyber-native)
