@@ -5,7 +5,7 @@ If you're just gonna be using the server for media, I recommend using [osmc](htt
 They also make it really easy to set up stuff like ftp, ssh, torrenting clients etc...\
 And if you're planning on using this with a traditional tv, there's really no beating [kodi](https://kodi.tv/) in my opinion.
 
-If not, then I recommend using [Jellyfin](https://jellyfin.org/) since it has a really nice web interface, mobile apps & the setup is similar to the services mentionned in [downloading_media.md](https://github.com/pindjouf/mediapiratestack/downloading_media.md).
+If not, then I recommend using [Jellyfin](https://jellyfin.org/) since it has a really nice web interface, mobile apps & the setup is similar to the services mentionned in [downloading_media.md](https://github.com/pindjouf/mediapiratestack/downloading_media.md](https://github.com/pindjouf/mediapiratestack/blob/main/downloading_media.md).
 
 If you just wanna go straight to the files and you plan on organizing everything neatly in directories and/or don't care for a pretty interface then I suggest downloading some media player like [VLC](https://www.videolan.org/).
 
