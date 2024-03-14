@@ -23,3 +23,5 @@ ___
 - You can have multiple peers.
 
 Once everything is set up you should be able to start your connection with `wg-quick up wg0` and to close it, replace `up` with `down`
+
+Don't forget to port forward port `51820` it is the wireguard port.
