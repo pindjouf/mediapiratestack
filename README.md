@@ -28,4 +28,4 @@ I expressly disclaim any responsibility or liability for the misuse of P2P file 
 
 I condemn piracy and advocate for respect of intellectual property rights. This material does not endorse or encourage illegal activities. Use P2P file sharing responsibly and lawfully, respecting copyright holders' rights.
 
-By accessing this material, you agree to release me from any liability arising from the misuse of P2P file sharing technology.
+By accessing this material, you agree to release me from any liability arising from the misuse of P2P file sharing technology. I shall have neither liability nor responsibility to any person or entity with respect to any loss or damages arising from the information contained in this repository or from the use of the programs accompanying it.
