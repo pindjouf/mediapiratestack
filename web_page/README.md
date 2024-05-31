@@ -4,4 +4,4 @@ This is a simple portal through which you can access all of your web-based servi
 
 Basic html and css you can make it as pretty or as basic as you want.
 
-![alt text](/assets/image.png)
+![alt text](/assets/screenshot.png)
