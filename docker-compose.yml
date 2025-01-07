@@ -3,6 +3,13 @@ volumes:
   mediapirate_data:
   jellyfin_config:
   jellyfin_cache:
+  transmission_config:
+  prowlarr_config:
+  sonarr_config:
+  lidarr_config:
+  radarr_config:
+  readarr_config:
+  jellyseerr_config:
 
 services:
   #---------------------------------------------------------------------#
@@ -28,13 +35,12 @@ services:
     container_name: jellyfin
     restart: 'unless-stopped'
     user: uid:gid
-    network_mode: 'host'
+    ports:
+      - '8096:8096'
     volumes:
       - jellyfin_config:/config
       - jellyfin_cache:/cache
-      - mediapirate_data/media:/media
-    networks:
-      - mediapirate_net
+      - mediapirate_data:/media
 
   #---------------------------------------------------------------------#
   #     Transmission - A Fast, Easy and Free BitTorrent Client          #
@@ -47,9 +53,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - mediapirate_data/transmission:/config
-      - mediapirate_data/downloads:/downloads
-      - mediapirate_data/watch:/watch
+      - transmission_config:/config
+      - mediapirate_data:/downloads
+      - mediapirate_data:/watch
     ports:
       - 9091:9091
       - 51413:51413
@@ -69,7 +75,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - mediapirate_data/prowlarr:/config
+      - prowlarr_config:/config
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -87,9 +93,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - mediapirate_data/sonarr:/config
-      - mediapirate_data/media/tv:/tv
-      - mediapirate_data/downloads:/downloads
+      - sonarr_config:/config
+      - mediapirate_data:/tv
+      - mediapirate_data:/downloads
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -107,9 +113,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - mediapirate_data/lidarr:/config
-      - mediapirate_data/media/music:/music
-      - mediapirate_data/downloads:/downloads
+      - lidarr_config:/config
+      - mediapirate_data:/music
+      - mediapirate_data:/downloads
     ports:
       - 8686:8686
     restart: unless-stopped
@@ -127,9 +133,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - mediapirate_data/radarr:/config
-      - mediapirate_data/media/movies:/movies
-      - mediapirate_data/downloads:/downloads
+      - radarr_config:/config
+      - mediapirate_data:/movies
+      - mediapirate_data:/downloads
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -147,9 +153,9 @@ services:
       - PGID=1000
       - TZ=Europe/London
     volumes:
-      - mediapirate_data/readarr:/config
-      - mediapirate_data/media/books:/books
-      - mediapirate_data/downloads:/downloads
+      - readarr_config:/config
+      - mediapirate_data:/books
+      - mediapirate_data:/downloads
     ports:
       - 8787:8787
     restart: unless-stopped
@@ -168,7 +174,7 @@ services:
     ports:
       - 5055:5055
     volumes:
-      - mediapirate_data/jellyseerr:/app/config
+      - jellyseerr_config:/app/config
     restart: unless-stopped
     networks:
       - mediapirate_net
