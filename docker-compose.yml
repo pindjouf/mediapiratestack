@@ -10,8 +10,26 @@ volumes:
   radarr_config:
   readarr_config:
   jellyseerr_config:
+  jackett_config:
+  media_data:
 
 services:
+  #---------------------------------------------------------------------#
+  #     Init - Directory Structure Setup                                 #
+  #---------------------------------------------------------------------#
+  init:
+    image: alpine:latest
+    command: >
+      sh -c "
+      mkdir -p /data/media/tv &&
+      mkdir -p /data/media/movies &&
+      mkdir -p /data/media/music &&
+      mkdir -p /data/media/books &&
+      chmod -R 777 /data"
+    volumes:
+      - media_data:/data
+    user: root
+
   #---------------------------------------------------------------------#
   #     Homarr - A simple, yet powerful dashboard for your server.      #
   #---------------------------------------------------------------------#
@@ -19,13 +37,16 @@ services:
     container_name: homarr
     image: ghcr.io/ajnart/homarr:latest
     restart: unless-stopped
+    user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - mediapirate_data:/app/data/homarr
+      - mediapirate_data:/downloads
     ports:
       - '7575:7575'
     networks:
       - mediapirate_net
+    depends_on:
+      - init
 
   #---------------------------------------------------------------------#
   #     Jellyfin - The Free Software Media System                       #
@@ -34,13 +55,17 @@ services:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: 'unless-stopped'
-    user: uid:gid
-    ports:
-      - '8096:8096'
+    user: root    # Already was root but keeping it consistent
     volumes:
       - jellyfin_config:/config
       - jellyfin_cache:/cache
-      - mediapirate_data:/media
+      - media_data:/data
+    ports:
+      - '8096:8096'
+    networks:
+      - mediapirate_net
+    depends_on:
+      - init
 
   #---------------------------------------------------------------------#
   #     Transmission - A Fast, Easy and Free BitTorrent Client          #
@@ -49,13 +74,12 @@ services:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=0
+      - PGID=0
       - TZ=Etc/UTC
     volumes:
       - transmission_config:/config
       - mediapirate_data:/downloads
-      - mediapirate_data:/watch
     ports:
       - 9091:9091
       - 51413:51413
@@ -63,6 +87,8 @@ services:
     restart: unless-stopped
     networks:
       - mediapirate_net
+    depends_on:
+      - init
 
   #---------------------------------------------------------------------#
   #     Prowlarr - Indexer Manager/Proxy built on the *arr .net         #
@@ -71,16 +97,19 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=0
+      - PGID=0
       - TZ=Etc/UTC
     volumes:
       - prowlarr_config:/config
+      - mediapirate_data:/downloads
     ports:
       - 9696:9696
     restart: unless-stopped
     networks:
       - mediapirate_net
+    depends_on:
+      - init
 
   #---------------------------------------------------------------------#
   #     Sonarr - Smart PVR for Newsgroup and BitTorrent Users           #
@@ -89,18 +118,22 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=0
+      - PGID=0
       - TZ=Etc/UTC
     volumes:
       - sonarr_config:/config
-      - mediapirate_data:/tv
       - mediapirate_data:/downloads
+      - media_data:/data
     ports:
       - 8989:8989
     restart: unless-stopped
     networks:
       - mediapirate_net
+    depends_on:
+      - init
+      - transmission
+      - prowlarr
 
   #---------------------------------------------------------------------#
   #     Lidarr - Music Collection Manager for Usenet and BitTorrent     #
@@ -109,18 +142,22 @@ services:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=0
+      - PGID=0
       - TZ=Etc/UTC
     volumes:
       - lidarr_config:/config
-      - mediapirate_data:/music
       - mediapirate_data:/downloads
+      - media_data:/data
     ports:
       - 8686:8686
     restart: unless-stopped
     networks:
       - mediapirate_net
+    depends_on:
+      - init
+      - transmission
+      - prowlarr
 
   #---------------------------------------------------------------------#
   #     Radarr - A fork of Sonarr to work with movies                   #
@@ -129,18 +166,22 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Brussels
     volumes:
       - radarr_config:/config
-      - mediapirate_data:/movies
       - mediapirate_data:/downloads
+      - media_data:/data
     ports:
       - 7878:7878
     restart: unless-stopped
     networks:
       - mediapirate_net
+    depends_on:
+      - init
+      - transmission
+      - prowlarr
 
   #---------------------------------------------------------------------#
   #     Readarr - Book Collection Manager for Usenet and BitTorrent     #
@@ -149,18 +190,22 @@ services:
     image: lscr.io/linuxserver/readarr:develop
     container_name: readarr
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/London
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/Brussels
     volumes:
       - readarr_config:/config
-      - mediapirate_data:/books
       - mediapirate_data:/downloads
+      - media_data:/media
     ports:
       - 8787:8787
     restart: unless-stopped
     networks:
       - mediapirate_net
+    depends_on:
+      - init
+      - transmission
+      - prowlarr
 
   #---------------------------------------------------------------------#
   #     Jellyseerr - Movie & TV Show Request Manager for Jellyfin       #
@@ -170,14 +215,44 @@ services:
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
-      - TZ=Asia/Tashkent
+      - TZ=Europe/Brussels
+      - PUID=0
+      - PGID=0
     ports:
       - 5055:5055
     volumes:
-      - jellyseerr_config:/app/config
+      - jellyseerr_config:/config
     restart: unless-stopped
     networks:
       - mediapirate_net
+    depends_on:
+      - init
+      - jellyfin
+      - radarr
+      - sonarr
+
+  #---------------------------------------------------------------------#
+  #     Jackett - API Support for your favorite torrent trackers        #
+  #---------------------------------------------------------------------#
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Etc/UTC
+      - AUTO_UPDATE=true
+    volumes:
+      - jackett_config:/config
+      - mediapirate_data:/downloads
+      - media_data:/media
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+    networks:
+      - mediapirate_net
+    depends_on:
+      - init
 
 networks:
   mediapirate_net:
